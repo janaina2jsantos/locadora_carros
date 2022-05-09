@@ -23,28 +23,22 @@ class MarcaRequest extends FormRequest
      */
     public function rules()
     {
-        if ($this->method() == 'PUT' || $this->method() == 'PATCH') {
-            // id do registro que será desconsiderado na pesquisa do unique
-            $id = $this->route()->parameter('marca')->id;
-            $name_rules  = 'unique:marcas,nome,'.$id.',id'; 
-            $image_rules = 'file|mimes:jpeg,png,jpg,gif';
-        }
-        else {
-            $name_rules  = 'required|unique:marcas,nome';
-            $image_rules = 'required|file|mimes:jpeg,png,jpg,gif';
-        }
-
+        // id do registro que será desconsiderado na pesquisa do unique
+        $id = $this->route()->parameter('marca');
+        
         return [
-            'nome'   => $name_rules,
-            'imagem' => $image_rules
+            'nome'   => (!$id ? 'required|min:3|unique:marcas,nome' : 'min:3|unique:marcas,nome,'.$id.',id'),
+            'imagem' => (!$id ? 'required|file|mimes:jpeg,png,jpg,gif' : 'file|mimes:jpeg,png,jpg,gif')
         ];
     }
+
 
     public function messages()
     {
         return [
             'required'     => 'O campo :attribute é obrigatório.',
-            'nome.unique'  => 'O nome da marca já existe.',
+            'nome.unique'  => 'Este nome já está cadastrado.',
+            'nome.min'     => 'O nome da marca deve conter no mínimo 3 caracteres.',
             'imagem.mimes' => 'Arquivo inválido. Selecione um arquivo do tipo imagem.'
         ];
     }

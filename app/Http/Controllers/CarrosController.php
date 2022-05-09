@@ -2,21 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Carro;
 use Illuminate\Http\Request;
+use App\Models\Carro;
+
 
 class CarrosController extends Controller
 {
-    public $carro;
+    private $carro;
 
-    // Injeção da instância do Model
-    // ==================================
-    // Model no Construtor: Injetando o Model como sendo um objeto.
-    // Injetar a instância do Model no construtor e atribuir esse objeto como sendo um
-    // atributo do Controller.
-    // O construtor é executado automaticamente quando o objeto é instanciado.
-
-    public function __construct(Carro $carro) // aqui é o mesmo de ter feito new Carro
+    // Injetando a instância do Model no construtor 
+    // ===============================================
+    public function __construct(Carro $carro) 
     {
         $this->carro = $carro;
     }

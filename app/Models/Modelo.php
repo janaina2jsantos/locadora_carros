@@ -9,7 +9,7 @@ class Modelo extends Model
 {
     use HasFactory;
 
-    protected $table = "modelos";
+    protected $table    = "modelos";
     protected $fillable = [
         'marca_id', 
         'nome', 
@@ -19,4 +19,9 @@ class Modelo extends Model
         'air_bag', 
         'abs'
     ];
+
+    public function marca()
+    {
+        return $this->belongsTo(Marca::class, "marca_id", "id");
+    }
 }
