@@ -23,20 +23,15 @@ class MarcaRequest extends FormRequest
      */
     public function rules()
     {
-        // id do registro que será desconsiderado na pesquisa do unique
-        $id = $this->route()->parameter('marca')->id;
-
-        if ($this->method() == 'PUT') {
-            $name_rules  = 'required|unique:marcas,nome,'.$id.',id';
-            $image_rules = 'required|mimes:jpeg,png,jpg,gif,svg';
-        }
-        else if($this->method() == 'PATCH') {
+        if ($this->method() == 'PUT' || $this->method() == 'PATCH') {
+            // id do registro que será desconsiderado na pesquisa do unique
+            $id = $this->route()->parameter('marca')->id;
             $name_rules  = 'unique:marcas,nome,'.$id.',id'; 
-            $image_rules = 'mimes:jpeg,png,jpg,gif,svg';
+            $image_rules = 'file|mimes:jpeg,png,jpg,gif';
         }
         else {
             $name_rules  = 'required|unique:marcas,nome';
-            $image_rules = 'required|mimes:jpeg,png,jpg,gif,svg';
+            $image_rules = 'required|file|mimes:jpeg,png,jpg,gif';
         }
 
         return [
@@ -48,9 +43,9 @@ class MarcaRequest extends FormRequest
     public function messages()
     {
         return [
-            'required'    => 'O campo :attribute é obrigatório.',
-            'nome.unique' => 'O nome da marca já existe.',
-            'image.mimes' => 'Esse arquivo não é válido.',
+            'required'     => 'O campo :attribute é obrigatório.',
+            'nome.unique'  => 'O nome da marca já existe.',
+            'imagem.mimes' => 'Arquivo inválido. Selecione um arquivo do tipo imagem.'
         ];
     }
 }

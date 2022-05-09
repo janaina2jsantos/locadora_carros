@@ -28,9 +28,12 @@ class MarcasController extends Controller
      */
     public function store(MarcaRequest $request)
     {   
+        $imagem  = $request->file('imagem');
+        $img_urn = $imagem->store('imagens', 'public');
+
         $marca = Marca::create([
             'nome'   => $request->nome,
-            'imagem' => $request->file('imagem')->getClientOriginalName()
+            'imagem' => $img_urn
         ]);
 
         return response()->json(['marca' => $marca, 'msg' => 'Marca cadastrada com sucesso!'], 200); 
@@ -56,9 +59,12 @@ class MarcasController extends Controller
      */
     public function update(MarcaRequest $request, Marca $marca)
     {
+        $imagem  = $request->file('imagem');
+        $img_urn = $imagem->store('imagens', 'public');
+
         $marca->update([
             'nome'   => $request->input('nome')  ? $request->input('nome') : $marca->nome,
-            'imagem' => $request->file('imagem') ? $request->file('imagem')->getClientOriginalName() : $marca->imagem
+            'imagem' => $img_urn ? $img_urn : $marca->imagem
         ]);
 
         return response()->json(['marca' => $marca, 'msg' => 'Marca atualizada com sucesso!'], 200); 
@@ -77,7 +83,7 @@ class MarcasController extends Controller
             return response()->json(['msg' => 'A marca foi excluída com sucesso!'], 200); 
         }
         catch(Exception $e) {
-            return $e;
+            return $e->getMessage();
         }
     }
 }
