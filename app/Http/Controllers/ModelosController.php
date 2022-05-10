@@ -21,10 +21,44 @@ class ModelosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $modelos = $this->modelo->with('marca')->get();
+        $modelos = [];
+
+        if ($request->has('atributos')) {
+            // pegando atributos do modelo
+            $atributos = $request->atributos;
+            // iniciando a montagem da query builder
+            // o selectRaw faz um bind de valores na query builder.
+            $modelos = $this->modelo->selectRaw($atributos);
+        }
+        else {
+            $modelos = $this->modelo->select();
+        }
+
+        if ($request->has('atributos_marca')) {
+            // pegando atributos do relacionamento de modelo com marcas
+            $atributos_marca = $request->atributos_marca; 
+            $modelos = $modelos->with('marca:id,'.$atributos_marca);
+        }
+        else {
+            $modelos = $modelos->with('marca');
+        }
+
+        if ($request->has('filtros')) {
+            $filtros = explode(';', $request->filtros);
+            foreach($filtros as $key => $filtro) {
+                $f = explode(':', $filtro);
+                $modelos = $modelos->where($f[0], $f[1], $f[2]);
+            }
+        }
+
+        // finalizando a query
+        $modelos = $modelos->get();
         return $modelos;
+
+        // Ex: url com atributos e filtros
+        // localhost:8000/api/modelos?atributos=nome,imagem,abs,marca_id&atributos_marca=nome,imagem&filtros=nome:like:%Toyota%;abs:=:0
     }
 
     /**
