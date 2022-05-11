@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Modelo;
 use App\Http\Requests\ModeloRequest;
 use Illuminate\Support\Facades\Storage;
+use App\Repositories\ModeloRepository;
 
 
 class ModelosController extends Controller
@@ -23,40 +24,29 @@ class ModelosController extends Controller
      */
     public function index(Request $request)
     {
-        $modelos = [];
+       $modeloRepository = new ModeloRepository($this->modelo);
 
         if ($request->has('atributos')) {
-            // pegando atributos do modelo
-            $atributos = $request->atributos;
-            // iniciando a montagem da query builder
-            // o selectRaw faz um bind de valores na query builder.
-            $modelos = $this->modelo->selectRaw($atributos);
+            // pegando os atributos de modelo
+            $atributos = $request->atributos;  
+            $modeloRepository->selectRegistrosAtributos($atributos);
         }
-        else {
-            $modelos = $this->modelo->select();
-        }
-
+       
         if ($request->has('atributos_marca')) {
-            // pegando atributos do relacionamento de modelo com marcas
+            // pegando os atributos da marca (relacionamento Marca/Modelo)
             $atributos_marca = $request->atributos_marca; 
-            $modelos = $modelos->with('marca:id,'.$atributos_marca);
+            // chama o método passando o relacionamento
+            $modeloRepository->selectRegistrosAtributosRelacionados('marca:id,'.$atributos_marca);
         }
         else {
-            $modelos = $modelos->with('marca');
+            $modeloRepository->selectRegistrosAtributosRelacionados('marca');
         }
 
         if ($request->has('filtros')) {
-            $filtros = explode(';', $request->filtros);
-            foreach($filtros as $key => $filtro) {
-                $f = explode(':', $filtro);
-                $modelos = $modelos->where($f[0], $f[1], $f[2]);
-            }
+            $modeloRepository->filtro($request->filtros);
         }
 
-        // finalizando a query
-        $modelos = $modelos->get();
-        return $modelos;
-
+        return response()->json($modeloRepository->getResultado(), 200); 
         // Ex: url com atributos e filtros
         // localhost:8000/api/modelos?atributos=nome,imagem,abs,marca_id&atributos_marca=nome,imagem&filtros=nome:like:%Toyota%;abs:=:0
     }

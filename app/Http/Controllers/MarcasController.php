@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Marca;
 use App\Http\Requests\MarcaRequest;
 use Illuminate\Support\Facades\Storage;
+use App\Repositories\MarcaRepository;
 
 
 class MarcasController extends Controller
@@ -24,36 +25,30 @@ class MarcasController extends Controller
      */
     public function index(Request $request)
     {
-        $marcas = [];
+        $marcaRepository = new MarcaRepository($this->marca);
 
         if ($request->has('atributos')) {
-            // pegando atributos de marca
+            // pegando os atributos de marca
             $atributos = $request->atributos;  
-            $marcas = $this->marca->selectRaw($atributos);
+            // $marcas = $this->marca->selectRaw($atributos);
+            $marcaRepository->selectRegistrosAtributos($atributos);
         }
-        else {
-            $marcas = $this->marca->select();
-        }
-
+       
         if ($request->has('atributos_modelo')) {
-            // pegando atributos do relacionamento de marca com modelos
+            // pegando os atributos do modelo (relacionamento Marca/Modelo)
             $atributos_modelo = $request->atributos_modelo; 
-            $marcas = $marcas->with('modelos:id,'.$atributos_modelo);
+            // chama o método passando o relacionamento
+            $marcaRepository->selectRegistrosAtributosRelacionados('modelos:id,'.$atributos_modelo);
         }
         else {
-            $marcas = $marcas->with('modelos');
+            $marcaRepository->selectRegistrosAtributosRelacionados('modelos');
         }
 
         if ($request->has('filtros')) {
-            $filtros = explode(';', $request->filtros);
-            foreach($filtros as $key => $filtro) {
-                $f = explode(':', $filtro);
-                $marcas = $marcas->where($f[0], $f[1], $f[2]);
-            }
+            $marcaRepository->filtro($request->filtros);
         }
 
-        $marcas = $marcas->get();
-        return $marcas;
+        return response()->json($marcaRepository->getResultado(), 200); 
     }
 
     /**
