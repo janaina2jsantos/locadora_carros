@@ -8,7 +8,6 @@ use App\Http\Requests\MarcaRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\MarcaRepository;
 
-
 class MarcasController extends Controller
 {
     private $marca;
@@ -30,7 +29,6 @@ class MarcasController extends Controller
         if ($request->has('atributos')) {
             // pegando os atributos de marca
             $atributos = $request->atributos;  
-            // $marcas = $this->marca->selectRaw($atributos);
             $marcaRepository->selectRegistrosAtributos($atributos);
         }
        
@@ -73,7 +71,7 @@ class MarcasController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Marca  $marca
+     * @param  \integer
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -86,7 +84,7 @@ class MarcasController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Marca  $marca
+     * @param  \integer
      * @return \Illuminate\Http\Response
      */
     public function update(MarcaRequest $request, $id)
@@ -112,7 +110,7 @@ class MarcasController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Cliente  $cliente
+     * @param  \integer
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

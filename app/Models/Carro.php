@@ -9,6 +9,11 @@ class Carro extends Model
 {
     use HasFactory;
 
-    protected $table = "carros";
+    protected $table    = "carros";
     protected $fillable = ['modelo_id', 'placa', 'disponivel', 'km'];
+
+    public function modelo()
+    {
+        return $this->belongsTo(Modelo::class, "modelo_id", "id");
+    }
 }

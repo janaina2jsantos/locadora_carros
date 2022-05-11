@@ -8,7 +8,6 @@ use App\Http\Requests\ModeloRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\ModeloRepository;
 
-
 class ModelosController extends Controller
 {
     private $modelo;

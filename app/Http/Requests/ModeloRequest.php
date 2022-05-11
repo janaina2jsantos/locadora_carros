@@ -24,15 +24,14 @@ class ModeloRequest extends FormRequest
     public function rules()
     {
         $id = $this->route()->parameter('modelo');
-
         return [
             'marca_id' => 'exists:marcas,id',
             'nome'     => (!$id ? 'required|min:3|unique:modelos,nome' : 'min:3|unique:modelos,nome,'.$id.',id'),
             'imagem'   => (!$id ? 'required|file|mimes:jpeg,png,jpg,gif' : 'file|mimes:jpeg,png,jpg,gif'),
-            'numero_portas' => (!$id ? 'required|integer|digits_between:1,5' : ''),
-            'lugares' => (!$id ? 'required|integer|digits_between:1,20' : ''),
-            'air_bag' => (!$id ? 'required|boolean' : ''),
-            'abs'     => (!$id ? 'required|boolean' : '')
+            'numero_portas' => (!$id ? 'required|integer|digits_between:1,5' : 'integer|digits_between:1,5'),
+            'lugares' => (!$id ? 'required|integer|digits_between:1,20' : 'integer|digits_between:1,20'),
+            'air_bag' => (!$id ? 'required|boolean' : 'boolean'),
+            'abs'     => (!$id ? 'required|boolean' : 'boolean')
         ];
     }
 
@@ -40,7 +39,7 @@ class ModeloRequest extends FormRequest
     {
         return [
             'required'     => 'O campo :attribute é obrigatório.',
-            'marca_id.exists' => 'O campo marca_id é obrigatório.',
+            'marca_id.exists' => 'A marca informada não existe.',
             'nome.unique'  => 'Este nome já está cadastrado.',
             'nome.min'     => 'O nome do modelo deve conter no mínimo 3 caracteres.',
             'imagem.mimes' => 'Arquivo inválido. Selecione um arquivo do tipo imagem.',

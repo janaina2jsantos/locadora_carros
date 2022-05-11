@@ -9,7 +9,7 @@ class Locacao extends Model
 {
     use HasFactory;
 
-    protected $table = "locacoes";
+    protected $table    = "locacoes";
     protected $fillable = [
         'cliente_id', 
         'carro_id', 
@@ -19,5 +19,15 @@ class Locacao extends Model
         'valor_diaria', 
         'km_inicial',
         'km_final'
-    ]
+    ];
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class, "cliente_id", "id");
+    }
+
+    public function carro()
+    {
+        return $this->belongsTo(Carro::class, "carro_id", "id");
+    }
 }

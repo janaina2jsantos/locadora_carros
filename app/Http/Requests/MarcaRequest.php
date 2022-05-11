@@ -25,13 +25,11 @@ class MarcaRequest extends FormRequest
     {
         // id do registro que será desconsiderado na pesquisa do unique
         $id = $this->route()->parameter('marca');
-        
         return [
             'nome'   => (!$id ? 'required|min:3|unique:marcas,nome' : 'min:3|unique:marcas,nome,'.$id.',id'),
             'imagem' => (!$id ? 'required|file|mimes:jpeg,png,jpg,gif' : 'file|mimes:jpeg,png,jpg,gif')
         ];
     }
-
 
     public function messages()
     {

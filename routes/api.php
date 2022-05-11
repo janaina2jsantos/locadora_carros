@@ -24,25 +24,11 @@ Route::prefix('v1')->group(function() {
     Route::apiResource('locacoes', 'LocacaoController');
     Route::apiResource('marcas', 'MarcasController');
     Route::apiResource('modelos', 'ModelosController');
+    // auth routes
+    Route::post('login', 'AuthController@login');
+    Route::post('logout', 'AuthController@logout');
+    Route::post('refresh', 'AuthController@refresh');
+    Route::post('profile', 'AuthController@profile');
+
 });
 
-
-
-
-// Route::get('/', function () {
-
-//     $obj = [
-//         [ 
-//             'nome'  => 'João Mendes Lopes',
-//             'idade' => 85,
-//             'plano' => 'Básico'
-//         ],
-//         [ 
-//             'nome'  => 'Maria Clara Rezende',
-//             'idade' => 12,
-//             'plano' => 'Básico'
-//         ],  
-//     ];
-
-//     return $obj;
-// });

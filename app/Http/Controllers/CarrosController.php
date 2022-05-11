@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Carro;
-
+use App\Http\Requests\CarroRequest;
+use App\Repositories\CarroRepository;
 
 class CarrosController extends Controller
 {
@@ -21,10 +22,31 @@ class CarrosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $carros = $this->carro->all();
-        return $carros;
+        $carroRepository = new CarroRepository($this->carro);
+
+        if ($request->has('atributos')) {
+            // pegando os atributos de carro
+            $atributos = $request->atributos;  
+            $carroRepository->selectRegistrosAtributos($atributos);
+        }
+       
+        if ($request->has('atributos_modelo')) {
+            // pegando os atributos do modelo (relacionamento Carro/Modelo)
+            $atributos_modelo = $request->atributos_modelo; 
+            // chama o método passando o relacionamento
+            $carroRepository->selectRegistrosAtributosRelacionados('modelo:id,'.$atributos_modelo);
+        }
+        else {
+            $carroRepository->selectRegistrosAtributosRelacionados('modelo');
+        }
+
+        if ($request->has('filtros')) {
+            $carroRepository->filtro($request->filtros);
+        }
+
+        return response()->json($carroRepository->getResultado(), 200); 
     }
 
     /**
@@ -33,7 +55,7 @@ class CarrosController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CarroRequest $request)
     {
         $carro = $this->carro->create([
             'modelo_id'  => $request->modelo_id,
@@ -53,7 +75,7 @@ class CarrosController extends Controller
      */
     public function show($id)
     {
-        $carro = $this->carro->findOrFail($id);
+        $carro = $this->carro->with('modelo')->findOrFail($id);
         return $carro;
     }
 
@@ -64,14 +86,14 @@ class CarrosController extends Controller
      * @param  \integer
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CarroRequest $request, $id)
     {
         $carro = $this->carro->findOrFail($id);
         $carro->update([
             'modelo_id'  => $request->input('modelo_id'),
-            'placa'      => $request->input('placa'),
-            'disponivel' => $request->input('disponivel'),
-            'km'         => $request->input('km')
+            'placa'      => isset($request->placa) ? $request->input('placa') : $carro->placa,
+            'disponivel' => isset($request->disponivel) ? $request->input('disponivel') : $carro->disponivel,
+            'km'         => isset($request->km) ? $request->input('km') : $carro->km
         ]);
 
         return response()->json(['carro' => $carro, 'msg' => 'Carro atualizado com sucesso!'], 200); 
@@ -85,8 +107,13 @@ class CarrosController extends Controller
      */
     public function destroy($id)
     {
-        $carro = $this->carro->findOrFail($id);
-        $carro->delete();
-        return response()->json(['msg' => 'O carro foi excluído com sucesso!'], 200); 
+        try{
+            $carro = $this->carro->findOrFail($id);
+            $carro->delete();
+            return response()->json(['msg' => 'O carro foi excluído com sucesso!'], 200);
+        }
+        catch(Exception $e) {
+            return $e->getMessage();
+        }
     }
 }
