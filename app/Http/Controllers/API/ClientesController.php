@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
 use App\Http\Requests\ClienteRequest;
 use App\Repositories\ClienteRepository;
+use App\Http\Controllers\Controller;
 
 class ClientesController extends Controller
 {

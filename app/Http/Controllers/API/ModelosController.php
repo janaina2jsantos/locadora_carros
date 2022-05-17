@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Models\Modelo;
 use App\Http\Requests\ModeloRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\ModeloRepository;
+use App\Http\Controllers\Controller;
 
 class ModelosController extends Controller
 {

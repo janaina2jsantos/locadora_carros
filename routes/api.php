@@ -18,17 +18,24 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::prefix('v1')->group(function() {
-    Route::apiResource('clientes', 'ClientesController');
-    Route::apiResource('carros', 'CarrosController');
-    Route::apiResource('locacoes', 'LocacaoController');
-    Route::apiResource('marcas', 'MarcasController');
-    Route::apiResource('modelos', 'ModelosController');
+Route::namespace("API")->prefix('v1')->group(function() {
     // auth routes
     Route::post('login', 'AuthController@login');
-    Route::post('logout', 'AuthController@logout');
-    Route::post('refresh', 'AuthController@refresh');
-    Route::post('profile', 'AuthController@profile');
-
+    // rotas que precisam de autenticação(logar no sistema) e de um token de autorização(JWT)
+    Route::middleware('jwt.auth')->group(function() {
+        Route::apiResource('clientes', 'ClientesController');
+        Route::apiResource('carros', 'CarrosController');
+        Route::apiResource('locacoes', 'LocacaoController');
+        Route::apiResource('marcas', 'MarcasController');
+        Route::apiResource('modelos', 'ModelosController');
+        // pegar os dados do usuário logado
+        Route::post('profile', 'AuthController@profile');
+        // renovar o token de autorização
+        Route::post('refresh', 'AuthController@refresh');
+        // logout
+        Route::post('logout', 'AuthController@logout');
+    });
 });
+
+
 

@@ -16,3 +16,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+Route::namespace("Web")->middleware('auth')->group(function() {
+    Route::get('/home', 'HomeController@index')->name('home');
+    // marcas
+    Route::get('/marcas', 'MarcasController@index')->name('marcas.all');
+});

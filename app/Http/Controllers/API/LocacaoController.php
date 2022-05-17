@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use App\Models\Locacao;
 use Illuminate\Http\Request;
 use App\Http\Requests\LocacaoRequest;
 use App\Repositories\LocacaoRepository;
+use App\Http\Controllers\Controller;
 
 class LocacaoController extends Controller
 {

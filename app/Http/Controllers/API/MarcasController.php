@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Models\Marca;
 use App\Http\Requests\MarcaRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\MarcaRepository;
+use App\Http\Controllers\Controller;
 
 class MarcasController extends Controller
 {
