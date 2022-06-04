@@ -8,6 +8,6 @@
 
 <script>
     export default {
-        props: ['label_id', 'titulo', 'help_id', 'texto_help' ],
+        props: ['label_id', 'titulo', 'help_id', 'texto_help' ]
     }
 </script>

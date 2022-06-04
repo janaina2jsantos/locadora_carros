@@ -47,7 +47,7 @@ class MarcasController extends Controller
             $marcaRepository->filtro($request->filtros);
         }
 
-        return response()->json($marcaRepository->getResultado(), 200); 
+        return response()->json($marcaRepository->getResultadoPaginado(5), 200); 
     }
 
     /**
@@ -75,10 +75,9 @@ class MarcasController extends Controller
      * @param  \integer
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Marca $marca)
     {
-        $marca = $this->marca->with('modelos')->findOrFail($id);
-        return $marca;
+        return $marca->with('modelos')->find($marca);
     }
 
     /**
@@ -90,22 +89,31 @@ class MarcasController extends Controller
      */
     public function update(MarcaRequest $request, $id)
     {
-        $marca = $this->marca->findOrFail($id);
+        try{
+            $marca = $this->marca->findOrFail($id);
+            // remove a imagem antiga caso uma nova imagem seja enviada no request
+            if ($request->file('imagem')) {
+                Storage::disk('public')->delete($marca->imagem);
+                $imagem  = $request->file('imagem');
+                $img_urn = $imagem->store('imagens/marcas', 'public');
+            }
 
-        // remove a imagem antiga caso uma nova imagem tenha sido enviada no request
-        if ($request->file('imagem')) {
-            Storage::disk('public')->delete($marca->imagem);
+            \DB::beginTransaction();
+            $marca->update([
+                'nome'   => isset($request->nome) ? $request->input('nome') : $marca->nome,
+                'imagem' => isset($img_urn) ? $img_urn : $marca->imagem
+            ]);
+            
+            \DB::commit();
+            return response()->json(['marca' => $marca, 'msg' => 'Marca atualizada com sucesso!'], 200); 
         }
-
-        $imagem  = $request->file('imagem');
-        $img_urn = isset($imagem ) ? $imagem->store('imagens/marcas', 'public') : $marca->imagem;
-
-        $marca->update([
-            'nome'   => isset($request->nome) ? $request->input('nome') : $marca->nome,
-            'imagem' => $img_urn 
-        ]);
-
-        return response()->json(['marca' => $marca, 'msg' => 'Marca atualizada com sucesso!'], 200); 
+        catch(\Exception $e) {
+            \DB::rollback();
+            return \Response::json(array(
+                'status' => 500,
+                'erro'   => 'Não foi possível atualizar o cadastro. ' . $e->getMessage()
+            ), 500);
+        }
     }
 
     /**
@@ -120,12 +128,18 @@ class MarcasController extends Controller
             $marca = $this->marca->findOrFail($id);
             // remove a imagem associada à marca
             Storage::disk('public')->delete($marca->imagem);
+            \DB::beginTransaction();
             // remove a marca
             $marca->delete();
+            \DB::commit();
             return response()->json(['msg' => 'A marca foi excluída com sucesso!'], 200); 
         }
-        catch(Exception $e) {
-            return $e->getMessage();
+        catch(\Exception $e) {
+            \DB::rollback();
+            return \Response::json(array(
+                'status' => 500,
+                'erro'   => 'Não foi possível excluir o cadastro. ' . $e->getMessage()
+            ), 500);
         }
     }
 }

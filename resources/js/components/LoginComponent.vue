@@ -79,7 +79,7 @@
                         // console.log(data.token);
                         if (data.token) {
                             // armazenar o token na seção de cookies do navegador
-                            document.cookie = 'meu_token='+data.token+';SameSite=Lax';
+                            document.cookie = 'token='+data.token+';SameSite=Lax';
                         }
                         // enviar o formulário
                         e.target.submit();
