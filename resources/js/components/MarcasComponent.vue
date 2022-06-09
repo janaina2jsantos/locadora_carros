@@ -126,6 +126,8 @@
         <!-- Modal para editar marca -->
         <modal-component id_modal="editarMarca" titulo="Atualizar marca">
             <template v-slot:mensagem_alert>
+                <alert-component tipo="success" titulo="Sucesso!" v-bind:detalhes="$store.state.transacao" v-if="$store.state.transacao.status == 'sucesso'"></alert-component>
+                <alert-component tipo="danger" titulo="Erro!" v-bind:detalhes="$store.state.transacao" v-if="$store.state.transacao.status == 'erro'"></alert-component> 
             </template>
 
             <template v-slot:conteudo>
@@ -272,7 +274,6 @@
                     })
             },
             atualizarMarca() {
-
                 let url = this.urlBase + '/' + this.$store.state.item.id;
                 let formData = new FormData();
 
@@ -294,11 +295,15 @@
                 axios.post(url, formData, config)
                     .then(response => {
                         console.log('Atualizado com sucesso!', response);
-                        //limpa o input de seleção de arquivo
+                        //limpar o input de seleção de arquivo
                         atualizarImagem.value = '';
+                        this.$store.state.transacao.status = 'sucesso';
+                        this.$store.state.transacao.mensagem = response.data.msg;
                         this.carregarMarcas();
                     })
                     .catch(errors => {
+                        this.$store.state.transacao.status = 'erro';
+                        this.$store.state.transacao.mensagem = errors.response.data.errors.nome[0];
                         console.log('Erro de atualização', errors.response);
                     })
             },

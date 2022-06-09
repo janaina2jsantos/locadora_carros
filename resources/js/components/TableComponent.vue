@@ -7,15 +7,17 @@
                     <th></th>
                 </tr>
             </thead>
-
             <tbody>
                 <tr v-for="obj, key in dadosFiltrados" :key="key">
                     <td v-for="valor, chave in obj" :key="chave">
+                        <span v-if="titulos[chave].tipo =='text'">
+                            {{ valor }}
+                        </span>
+                        <span v-if="titulos[chave].tipo =='data'">
+                            {{ valor | formataDataTempo }}
+                        </span>
                         <span v-if="titulos[chave].tipo =='imagem'">
                             <img v-bind:src="'/storage/'+valor" width="60" height="60"/>
-                        </span>
-                        <span v-else>
-                            {{ valor }}
                         </span>
                     </td>
                     <td>
@@ -31,6 +33,27 @@
 
 <script>
     export default {
+        filters: {
+            formataDataTempo(data) {
+                if (!data) {
+                    return '';
+                }
+
+                data = data.split('T');
+                let data02 = data[0];
+                let tempo02 = data[1];
+
+                // formatando a data
+                data02 = data02.split('-');
+                data02 = data02[2] + '/' + data02[1] + '/' + data02[0];
+
+                // formatando o tempo
+                tempo02 = tempo02.split('.');
+                tempo02 = tempo02[0];
+
+                return data02 + ' - ' + tempo02;
+            }
+        },
         props: ['dados', 'titulos', 'botoes'],
         methods: {
             // colocar na store o objeto clicado

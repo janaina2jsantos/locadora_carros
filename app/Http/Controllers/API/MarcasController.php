@@ -8,6 +8,7 @@ use App\Http\Requests\MarcaRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\MarcaRepository;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class MarcasController extends Controller
 {
@@ -56,8 +57,17 @@ class MarcasController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(MarcaRequest $request)
+    public function store(Request $request)
     {   
+        $this->validate($request, [
+            'nome' => 'required|min:3|unique:marcas,nome',
+            'imagem' => 'required|image|mimes:jpeg,png,jpg,gif',
+        ],[
+            'nome.unique'  => 'Esta marca já está cadastrada.',
+            'nome.min'     => 'O nome da marca deve conter no mínimo 3 caracteres.',
+            'imagem.mimes' => 'Arquivo inválido. Selecione um arquivo do tipo imagem.'
+        ]);
+
         $imagem  = $request->file('imagem');
         $img_urn = $imagem->store('imagens/marcas', 'public');
 
@@ -87,11 +97,21 @@ class MarcasController extends Controller
      * @param  \integer
      * @return \Illuminate\Http\Response
      */
-    public function update(MarcaRequest $request, $id)
+    public function update(Request $request, $id)
     {
+        $this->validate($request, [
+            'nome' => 'required|min:3|unique:marcas,nome,'.$id.'id',
+            'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+        ],[
+            'nome.required' => 'O campo Nome é obrigatório.',
+            'nome.unique'  => 'Esta marca já está cadastrada.',
+            'nome.min'     => 'O nome da marca deve conter no mínimo 3 caracteres.',
+            'imagem.mimes' => 'Arquivo inválido. Selecione um arquivo do tipo imagem.'
+        ]);
+
         try{
             $marca = $this->marca->findOrFail($id);
-            // remove a imagem antiga caso uma nova imagem seja enviada no request
+            // se tiver uma imagem no request, remove a imagem antiga e guarda o nome da imagem em $img_urn
             if ($request->file('imagem')) {
                 Storage::disk('public')->delete($marca->imagem);
                 $imagem  = $request->file('imagem');
